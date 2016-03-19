@@ -1,0 +1,2 @@
+# donor_lifetimes_non_profit
+The object of this work is to quantify the factors in influencing donor retention for a major South-Bay non-profit.  I stratified the data and applied a patient survival model to predict the lifetimes and the hazards that will surface at different points of a donor's life.  Then I calculated the Customer Lifetime Value (CLV) for each donor based on predicted lifetime, cost, and donation history.  This allows the non-profit to make donor retention decisions based on data and analytics, not on instincts.
