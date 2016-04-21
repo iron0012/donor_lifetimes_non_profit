@@ -15,7 +15,7 @@ Background
 Data
 ----
 - Donor database from South Bay non-profit. 2338 donors spanning over 40 years.
-- 100 features.  Examples: ZIP code, martial status, gender...
+- Each row contains >100 features.  Example of features: ZIP code, martial status, gender...
 
 
 Modeling
@@ -28,26 +28,49 @@ Approach
 
 	λ(t) = b<sub>0</sub>(t) + b<sub>1</sub>(t)x<sub>1</sub> +. . . +b<sub>N</sub>(t)x<sub>T</sub>
 
+- To train the model, we only use the donors who have churned (not donated in the last two years).  In survival-model parlance, the donors who have not churned are "censored".  This is done because we do not know the lifetimes of these donors yet.   After the model is trained, we will use it to predict the lifetimes of the "censored" donors.
 
 - Why not a multi-decision tree model?  Because a patient-survival model is more interpretable.
 
-- Why not linear or logistic regression?  Because the residuals are not uniform over time.
+- Why not linear or logistic regression?  Because the residuals are not uniform over time.  This is turn to due to the fact that the number of donors decreases as more of them churn over time.
 
 Data processing
 ---------------
-- Data package "Lifelines" which contains the Aalen additive model
+- Python pandas was used to impute and clean up data.
+- Data package [ "Lifelines" ](http://lifelines.readthedocs.org/en/latest/) which contains the Aalen additive model.  
 
-Bootstrapping
--------------
-- The more than 100 features were whittled down to 76 based on the p values.  (Details not repeated here).  
+- The more than 100 features were whittled down to 7 by *backward stepwise selection.*  They are the following.
 	1.	ACGC (whether a donor comes from the ACGC branch of the organization)
-	2.	COS breakfast (A $100/plate breakfast event with a celebrity speaker)
+	2.	Celebrity breakfast (A $100/plate breakfast event with a celebrity speaker)
 	3.	Golf tournament (A golf tournament held at a country club that cost $1000 to play)
 	4.	Male (True = male, False = female)
 	5.	Married (True = married or partnered, False = single, divorced, or widowed)
 	6. 	Personal connection (True =  a personal friend or acquaintance of an employee of the agency.)
 	7.  Predicted income (Using the zip code, we scrapped the US Census Bureau website for the average household income and use this as the feature.)
+
+- The Keplan-Meier function (or estimator) was used initially to provide quick inspection of the data.  It represents the percent of the donors who have "survived" after a certain time.  Typical it is plotted to illustrate a data set that is stratified against a certain feature, such "married" or not "married."  It allows us to spot initial trends of the data set.   Details of the Kaplan-Meier function can be found [here](https://en.wikipedia.org/wiki/Kaplan–Meier_estimator).
+
+- Some initial observations.  Note that the error (shaded area = one standard deviation) increases with time.  This reflects the decrease in the sample size as time progresses (donors churn), and is the reason why a simple regression model is not appropriate (See "why not linear or logistic regression?" above.)  Because of this, the rest of the study will focus on the donor survival during for first 5 years.
+	1. High cost events such as the Golf tournaments and the Celebrity breakfasts lead to very short lifetimes compared to the overall population.  However, the Celebrity breakfast donors tend to have a higher survival rate for the first 3 years.
+	2. Female donors have a longer lifetime than male do.
+	3. Unmarried donors tend to churn more than married donors during the first 20 years, but if then the trend is reversed after 20 years.
+	4. Personal connection helps for the first 20 years, but not after.
+	5. Surprising, donors with below average income (compared to other donors, not to the general population) tend to stay longer donors with above average income.
+
+![Overall Kaplan-Meier function](/images/KMF_overall.png>)
+![Kaplan-Meier function for ACGC](/images/KMF_ACGC.png>)
+![Kaplan-Meier function for Celebrity breakfast](images/KMF_Celebrity_breakfast.png)
+![Kaplan-Meier function for Golf tournatments](/images/KMF_golf.png)
+![Kaplan-Meier function for Male](/images/KMF_male.png)
+![Kaplan-Meier function function for Married](/images/KMF_married.png)
+![Kaplan-Meier function function for Personal connection](/images/KMF_personal_connection.png)
+![Kaplan-Meier function for Predicted income](/images/KMF_predicted_income.png)
+
+Bootstrapping
+-------------
 - Because of the relative small data set, a bootstrap approach was used to model the data.   Samples were drawn with replacement from the original data set 10 000 times to train 10 000 models.  These 10 000 models generated 10 000 hazard functions.  
+
+- The 10 000 trained bootstrapped models took over 12 hours to be trained.  To save time, they are stored in the list which is then pickled.  This pickled file (AAF_list_10000) can be found in this folder.
 
 Results
 =======
@@ -58,7 +81,7 @@ The plots below show the hazard functions generated by the bootstrapped models. 
 
 ![Hazard function baseline](images/cum_haz_baseline0-5.png)
 
-- The hazard function for each hazard were plotted below. Each function shows at what time in a donor's lifetime hazard will emerge.  Note that even though these functions are called "hazards," when they are negative, they are actually "benefits" that prolong the lifetime of the donor.  For example, a higher than average income would produce a negative hazard over much of the lifetime of a donor.
+- The hazard function for each hazard is plotted below. Each function shows at what time in a donor's lifetime hazards will emerge.  Each figure is the composite of the result from 10 000 bootstrapped models.  Thus the spread represents the standard deviation of the models. Note that even though these functions are called "hazards," when they are negative, they are actually "benefits" that prolong the lifetime of the donor.  For example, a higher than average income would produce a negative hazard over much of the lifetime of a donor.
 
 ![Hazard function for ACGC](/images/cum_haz_ACGC0-5.png>)
 ![Hazard function for Celebrity breakfast](images/cum_haz_COS0-5.png)
@@ -71,9 +94,9 @@ The plots below show the hazard functions generated by the bootstrapped models. 
 2.	Predicting Hazards for individual donors
 	----------------------------------------
 
-- For any given donor (old or new), we can substitute his features into the model to predict the lifetime.  More importantly, we can customize a hazard function for each donor and predict at what times in her or his lifetime hazards will emerge (represented by steep slopes in the hazard function).  This is illustrated below by the plots of the hazard function 30 random donors, each with a different profile of features.   
+- For any given donor (old or new), we can substitute his features into the model to predict the lifetime.  More importantly, we can customize a hazard function for each donor and predict at what times in her or his lifetime hazards will emerge (represented by steep slopes in the hazard function).  This is illustrated below by the plots of the hazard function 4 random donors, represented by green, blue, red, and purple curves.  Each color is the composite of  the 10000 bootstrapped models.  Thus the uncertainty or the spread of the function is nicely shown by the spread. As can be seen, each donor has a different hazard profile.  For example, the green donor was recruited from a golf tournament which lead to a high hazard at 2nd year of his lifetime.  
 
-![CumulativeHazfor15donors](/images/Cum_haz_15donors.png)
+![CumulativeHazfor15donors](/images/donor_cum_hazard0-5-ii.png)
 
 3.	Donor lifetime values
 ---------------------
@@ -93,6 +116,6 @@ The results are plotted in the figures below.
 ===============
 1.	Donors recruited at *golf tournaments* have negative DLV of about -$1000.  This is not surprising because it cost $50 000 to hold each golf tounatment and the hazard function for golf is extremely high even after two years.
 
-2.	Donors who are recruited at the *Celebrity breakfast* have higher DLV than those who are not (the rest), event though the event cost $30 000 to hold.   This is because each event generated more donors and they each donate more money than the golf tournaments.
+2.	Donors who are recruited at the *Celebrity breakfast* have higher DLV than those who are not (the rest), even though each event costs $30 000 to hold.   This is because each event generated more donors and they each donate more money than the golf tournaments.
 
 3.  Unmarried donors have higher DLV than married donors, even though the hazard function for married is negative (indicating being married is beneficial).  This is also because unmarried donors tend to donor more than married donors.
