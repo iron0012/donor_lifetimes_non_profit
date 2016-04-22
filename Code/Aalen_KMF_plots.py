@@ -13,25 +13,26 @@ def plot_cum_haz_functions(AAF_list, x_max =40):
 	Parameters:
 	AAF_list: a list of Aalen additive instances created by the AalenAdditiveFitter
 	x_max = 40: maxiumum value of the x-axis.
+
+	Output:
+	Plots of the individual hazard functions for each specific hazard as a function of time.
 	'''
 
-    colors = ['grey', 'darksage', 'red', 'green', 'purple', 'lightgreen',\
-    		'magenta', 'gold']
-	for i, hazard in enumerate(AAF_list[1].columns):
-	    print hazard
-	    fig = plt.figure(figsize=(8, 8))
-	    plt.subplot(111)
-	    for j in range(len(AAF_list)):
-	        aaf = AAF_list[j]
-	        plt.plot(aaf.cumulative_hazards_[hazard], alpha =0.001, c = colors[i], label = hazard)
-	    plt.xlabel('Years', size = 15)
-	    plt.ylabel('Cumulative hazard function for ' + hazard, size = 20)
-	    plt.grid()
-	    plt.xlim(0,40)
-	    plt.show()
-	    plt.close()
-	    return
-	    
+	colors = ['grey', 'lightgreen', 'blue','red', 'magenta', 'gold', 'green', 'orange']	
+	for i, hazard in enumerate(AAF_list[0].hazards_.columns):
+		print 'hazard is', hazard
+		fig = plt.figure(figsize=(5, 5))
+		plt.subplot(111)
+		for j in range(len(AAF_list)):
+			aaf = AAF_list[j]
+			plt.plot(aaf.cumulative_hazards_[hazard], alpha =1, c = colors[i])
+		plt.xlabel('Years', size = 10)
+		plt.ylabel('Cumulative hazard function', size = 10)
+		plt.grid()
+		plt.xlim(0, x_max)
+		plt.show()
+	#plt.close
+
 def plot_Kaplan_Meier_overall(donor_dataset):
 	'''Accepts a dataframe of donor data.  Plots the overall Kaplan-Meier curve based of the lifetime of the donors.  The active donors ('censored') will be excluded from the plot.
 
