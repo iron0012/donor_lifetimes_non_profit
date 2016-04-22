@@ -53,9 +53,9 @@ Data processing
 - Some initial observations.  Note that the error (shaded area = one standard deviation) increases with time.  This reflects the decrease in the sample size as time progresses (donors churn), and is the reason why a simple regression model is not appropriate (See "why not linear or logistic regression?" above.)  Because of this, the rest of the study will focus on the donor survival during for first 5 years.
 	1. High cost events such as the Golf tournaments and the Celebrity breakfasts lead to very short lifetimes compared to the overall population.  However, the Celebrity breakfast donors tend to have a higher survival rate for the first 3 years.
 	2. Female donors have a longer lifetime than male do.
-	3. Unmarried donors tend to churn more than married donors during the first 20 years, but if then the trend is reversed after 20 years.
-	4. Personal connection helps for the first 20 years, but not after.
-	5. Surprising, donors with below average income (compared to other donors, not to the general population) tend to stay longer donors with above average income.
+	3. Unmarried donors tend to churn more than married donors during the first 20 years, but then the trend is reversed after 20 years.
+	4. Surprisingly, having a personal connection with the donor is not helpful in retaining the donor.
+	5. Not Surprisingly, donors with below average income (compared to other donors, not to the general population) tend to churn faster than donors with above average income.
 
 ![Overall Kaplan-Meier function](/images/KMF_overall.png>)
 ![Kaplan-Meier function for ACGC](/images/KMF_ACGC.png>)
@@ -70,7 +70,7 @@ Bootstrapping
 -------------
 - Because of the relative small data set, a bootstrap approach was used to model the data.   Samples were drawn with replacement from the original data set 10 000 times to train 10 000 models.  These 10 000 models generated 10 000 hazard functions.  
 
-- The 10 000 trained bootstrapped models took over 12 hours to be trained.  To save time, they are stored in the list which is then pickled.  This pickled file (AAF_list_10000) can be found in this folder.
+- The 10 000 trained bootstrapped models took over 12 hours to be trained.  To save time, they are stored in the list which is then pickled.  However, because of the size limit of github, I only loaded a shortened version of this pickled file with 100 bootstraps (AAF_list_100.p).  All results from this page are from the 10 000 bootstrapped models.
 
 Results
 =======
