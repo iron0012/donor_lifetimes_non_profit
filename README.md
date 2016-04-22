@@ -24,15 +24,15 @@ Approach
 --------
 - The Aalen Additive model, which is patient-survival model, was used to predict the lifetime. The model fits the data to a *hazard function* in turn is used to predict the lifetime.
 
-- The hazard function are features which can influence the lifetime of the patient, which is the donor in our use case.
+- The hazard function are composed of features (known as *hazards*) which can influence the lifetime of the patient, which is the donor in our use case.
 
-	λ(t) = b<sub>0</sub>(t) + b<sub>1</sub>(t)x<sub>1</sub> +. . . +b<sub>N</sub>(t)x<sub>T</sub>
+	λ(t) = b<sub>0</sub>(t) + b<sub>1</sub>(t)x<sub>1</sub> +. . . +b<sub>N</sub>(t)x<sub>T</sub>, where x<sub>n</sub> are the hazards and b<sub>n</sub> are the parameters.
 
-- To train the model, we only use the donors who have churned (not donated in the last two years).  In survival-model parlance, the donors who have not churned are "censored".  This is done because we do not know the lifetimes of these donors yet.   After the model is trained, we will use it to predict the lifetimes of the "censored" donors.
+- To train the model, we only use the donors who have churned (defined as not donated in the last two years).  In the survival-model parlance, the donors who have not churned are "censored," so they are removed from the training.  This is done because we do not know the lifetimes of these donors yet.   After the model is trained, we will use it to predict the lifetimes of the "censored" donors.
 
-- Why not a multi-decision tree model?  Because a patient-survival model is more interpretable.
-
-- Why not linear or logistic regression?  Because the residuals are not uniform over time.  This is turn to due to the fact that the number of donors decreases as more of them churn over time.
+- FAQ
+	1.	Why not a multi-decision tree model?  Because a patient-survival model is more interpretable.
+	2.	Why not linear or logistic regression?  Because the residuals are not uniform over time.  This is turn to due to the fact that the number of donors decreases as more of them churn over time.
 
 Data processing
 ---------------
