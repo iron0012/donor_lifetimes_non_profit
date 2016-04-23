@@ -55,6 +55,7 @@ def Bootstrap(df, bootstrap_count = 100):
     
     AAF_list = []  #This is a list to store the bootstrapped Aalen models
     for bootstrap_number in range(bootstrap_count):
+        print 'bootstrap number', bootstrap_number
         df_Bootstrap = resample(df)
         aaf = Aalen_model(df_Bootstrap)  #Calls the Aalen_model function to train a model aaf
         AAF_list.append(aaf)  #Appends aaf to AAF_list
@@ -75,7 +76,7 @@ def Aalen_predict_lifetimes(AAF_list, test_dataset):
 
     for i, aaf in enumerate(AAF_list):
         #This informs the use the progress of the iteration 
-        print 'i = ', i  
+        print 'Performing prediction on model number ', i, '.'  
         #Generates predictions for the dataset and appends them to the aaf_predict list.
         aaf_predict.append(aaf.predict_expectation(test_dataset.astype(float)).values)
 
@@ -113,7 +114,7 @@ def Aalen_predict_donor_cum_haz(AAF_list, test_dataset):
     
     return aaf_predict_donor_cum_haz
    
-   def Aalen_cum_haz(AAF_list, test_dataset):
+def Aalen_cum_haz(AAF_list, test_dataset):
     '''Accepts a list (AAF_list) containing m trained bootstrapped AAF models (trained by bootstrapping in the Bootstrap function) and a test data set (test_dataset).  Iterates through the list.  Outputs the cumulative hazard function for each feature (hazard).  Store them in a list.  Note that these dataframes cannot be simply averaged because the time intervals are not always the same.  
 
     Parameters:
@@ -126,10 +127,11 @@ def Aalen_predict_donor_cum_haz(AAF_list, test_dataset):
 
     aaf_cum_haz = []
     for i, aaf in enumerate(AAF_list):
-        #This informs the use the progress of the iteration 
-        print 'i = ', i  
-        aaf_cum_haz.append(aaf.cumulative_hazards_)
-        #Generates hazard functions that are tailored to each donor and append them to aaf_predict_cum_haz
-    
+    #This informs the use the progress of the iteration 
+        print 'Performing predictions for model ', i , '.'
+        aaf_cum_haz.append(aaf.predict_cumulative_hazard(test_dataset))
+    #Generates hazard functions that are tailored to each donor and append them to aaf_predict_cum_haz
+
     return aaf_cum_haz
+
    

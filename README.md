@@ -15,7 +15,7 @@ Background
 Data
 ----
 - Donor database from South Bay non-profit.
-- 2338 donors spanning over 40 years.
+- 1328 donors spanning over 40 years.
 - Each row contains >100 features.  Example of features: ZIP code, martial status, gender...
 
 
@@ -34,10 +34,12 @@ Approach
 - FAQ
 	1.	Why not a multi-decision tree model?  Because a patient-survival model is more interpretable.
 	2.	Why not linear or logistic regression?  Because the residuals are not uniform over time.  This is turn to due to the fact that the number of donors decreases as more of them churn over time.
+	3.  Why not a proportional hazard model, such as the Cox proportional hazard model?  Because this assumes the hazards are in at a fixed proportion with each other over time.  There is no reason to believe that is true in our case.
 
 Data processing
 ---------------
 - Python pandas was used to impute and clean up data.
+- A column of '1' is added to the data as the baseline.  This is the represent all other hazards that are not explained by the included features.
 - Data package [ "Lifelines" ](http://lifelines.readthedocs.org/en/latest/) which contains the Aalen additive model was used to model and plot the data.
 
 - The more than 100 features were whittled down to 7 by *backward stepwise selection.*  These 7 featuers are as follows.
