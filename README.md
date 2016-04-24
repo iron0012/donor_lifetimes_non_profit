@@ -6,7 +6,7 @@ Background
 ----------
 
 - Only 20% of revenue of an average non-profit comes from donations (most of the rest of government contacts)
-- There is often no-coherent strategy for recruiting or retaining donors.  Traditional methods range from holding expensive special events to personal connections.  Often this is done by hunches and without any analytical support.
+- There is often no coherent strategy for recruiting or retaining donors.  Traditional methods range from holding expensive special events to personal connections.  Often this is done by hunches and without any analytical support.
 - Questions to be answered:
 	1.  What are the good predictors of donor lifetimes?  More importantly, how do these predictors influence them.
 	2.  How to extend donor lifetimes?
@@ -23,7 +23,7 @@ Modeling
 ========
 Approach
 --------
-- The Aalen Additive model, which is patient-survival model, was used to predict the lifetime. The model fits the data to a *hazard function* in turn is used to predict the lifetime.
+- The Aalen Additive model, which is patient-survival regression model, was used to predict the lifetime. The model fits the data to a *hazard function* in turn is used to predict the lifetime.  A detailed description of this *machine learning* methodology can be found in Ch.3 of master's dissertation by Huilin Gao [here.](http://archimede.mat.ulaval.ca/theses/H-Cao_05.pdf)
 
 - The hazard function is composed of features (known as *hazards*) which can influence the lifetime of each donor in our use case.
 
@@ -40,9 +40,12 @@ Data processing
 ---------------
 - Python pandas was used to impute and clean up data.
 - A column of '1' is added to the data as the baseline.  This is the represent all other hazards that are not explained by the included features.
-- Data package [ "Lifelines" ](http://lifelines.readthedocs.org/en/latest/) which contains the Aalen additive model was used to model and plot the data.
+- Data package [ "Lifelines" ](http://lifelines.readthedocs.org/en/latest/) which contains the Aalen additive model was used to model and plot the data.  The Lifelines package can be installed by typing pip install lifelines.  
+- Sample Python codes to train the models by bootstrapping and plot the results can be found in the 'Code' folder.  A Python interpreter is needed to run them.  
 
-- The more than 100 features were whittled down to 7 by *backward stepwise selection.*  These 7 featuers are as follows.
+-The general approach is to use the donors who have churned (uncensored) to train the model, which is then used to predict the lifetime ('Total_years') for the unchurned (censored) donors.
+
+- The more than 100 features were whittled down to 7 by *backward stepwise selection.*  These 7 features are as follows.
 	1.	ACGC (whether a donor comes from the ACGC branch of the organization).  This is a another non-profit that was merged into the organization in 1995.
 	2.	Celebrity breakfast (An annual $100/plate breakfast event with a celebrity speaker)
 	3.	Golf tournament (An annual golf tournament held at a country club that cost $1000 to play)
@@ -72,7 +75,7 @@ Bootstrapping
 -------------
 - Because of the relative small data set, a bootstrap approach was used to model the data.   Samples were drawn with replacement from the original data set 10 000 times to train 10 000 models.  These 10 000 models generated 10 000 hazard functions.  
 
-- The 10 000 trained bootstrapped models took over 12 hours to be trained.  To save time, they are stored in the list which is then pickled.  However, because of the size limit of github, I only loaded a shortened version of a file with 100 bootstraps (AAF_list_100.p).  All results from this page are from the 10 000 bootstrapped models.
+- The 10 000 trained bootstrapped models took over 12 hours to be trained.  To save time, they are stored in the list which is then pickled.  However, because of the size limit of github, I only loaded a shortened version of a file with 100 bootstraps (AAF_list_100.p).  All results shown this page are from the 10 000 bootstrapped models.
 
 Results
 =======
